@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informações sobre Países</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        img {
+            max-width: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        #countryInfo {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Informações sobre Países</h1>
+    
+    <label for="countrySelect">Selecione um país:</label>
+    <select id="countrySelect" onchange="getCountryInfo()">
+        <!-- O menu suspenso será preenchido dinamicamente pelo JavaScript -->
+    </select>
+
+    <div id="countryInfo">
+        <h2>Informações:</h2>
+        <p><strong>Nome do País:</strong> <span id="countryName"></span></p>
+        <p><strong>Sigla:</strong> <span id="countryCode"></span></p>
+        <p><strong>Capital:</strong> <span id="countryCapital"></span></p>
+        <p><strong>Bandeira:</strong></p>
+        <img id="countryFlag" alt="Bandeira do País">
+    </div>
+
+    <script>
+        // Função para preencher dinamicamente o menu suspenso com países
+        function populateCountries() {
+            var select = document.getElementById("countrySelect");
+
+            // Substitua "https://restcountries.com/v2/all" pela URL da API que fornece informações sobre países
+            var apiUrl = "https://restcountries.com/v2/all";
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(country => {
+                        var option = document.createElement("option");
+                        option.value = country.alpha2Code;
+                        option.textContent = country.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao obter a lista de países:', error));
+        }
+
+        function getCountryInfo() {
+            var select = document.getElementById("countrySelect");
+            var countryCode = select.value;
+
+            // Substitua "https://restcountries.com/v2/all" pela URL da API que fornece informações sobre países
+            var apiUrl = `https://restcountries.com/v2/alpha/${countryCode}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("countryName").innerText = data.name;
+                    document.getElementById("countryCode").innerText = data.alpha2Code;
+                    document.getElementById("countryCapital").innerText = data.capital;
+                    document.getElementById("countryFlag").src = data.flags.svg; // A API retorna a URL da bandeira em formato SVG
+                })
+                .catch(error => console.error('Erro ao obter informações do país:', error));
+        }
+
+        // Chama a função para preencher o menu suspenso quando a página carrega
+        window.onload = function () {
+            populateCountries();
+            getCountryInfo(); // Exibe as informações do primeiro país na lista por padrão
+        };
+    </script>
+</body>
+</html>
